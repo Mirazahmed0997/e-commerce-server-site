@@ -7,7 +7,8 @@ const { title } = require("process")
 const productSchema = new mongoose.Schema({
     title: { type: String, required: true },
     description: { type: String, required: true },
-    price: { type: Number, required: true },
+    buyPrice: { type: Number, required: true },
+    sellPrice: { type: Number, required: true },
     discountedPrice: { type: Number, required: false },
     discountedPersent: { type: Number, required: false },
     stockQuantity: { type: Number, required: false },
