@@ -12,5 +12,11 @@ app.get("/", (req, res) => {
     return res.status(200).send({ message: "Welcome to china Trade server", status: true })
 })
 
+const authrouters= require("./Routes/authRoute.js")
+app.use('/auth',authrouters);
+
+const userRouters= require('./Routes/userRoute.js')
+app.use('/api/users',userRouters)
+
 module.exports = app;
 

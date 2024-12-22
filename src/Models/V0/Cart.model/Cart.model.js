@@ -9,6 +9,6 @@ const cartSchema = new mongoose.Schema({
     discount: { type: Number, required: true, default: 0 },
 })
 
-const cart = mongoose.model("cart", cartItems)
+const cart = mongoose.model("cart", cartSchema)
 
 module.exports = cart 

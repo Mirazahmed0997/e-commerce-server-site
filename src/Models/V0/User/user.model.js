@@ -1,5 +1,5 @@
 const mongoose= require("mongoose")
-const { type } = require("os")
+// const { type } = require("os")
 
 const userSchema= mongoose.Schema({
     firstName:{type:String,required:true},
@@ -14,7 +14,7 @@ const userSchema= mongoose.Schema({
     paymentInformation:[
         {type:mongoose.Types.ObjectId, ref:"payment_information"}
     ],
-    reatings:[
+    ratings:[
         {type:mongoose.Schema.Types.ObjectId, ref:"ratings"}
     ],
     reviews:[
