@@ -16,7 +16,7 @@ const createCart = async (user) => {
     }
 }
 
-const fundUserCart = async (userId) => {
+const findUserCart = async (userId) => {
     try {
         let Cart = await cart.findOne({ user: user })
 
@@ -74,5 +74,5 @@ const addCartItem = async (userId, req) => {
 }
 
 module.exports = {
-    createCart, fundUserCart,addCartItem
+    createCart, findUserCart,addCartItem
 }

@@ -1,4 +1,4 @@
-const category = require("../../Models/V0/Category.model/category.model");
+ const category = require("../../Models/V0/Category.model/category.model");
 const products = require("../../Models/V0/product.model/product.model");
 
 async function createProduct(reqData) {
@@ -106,10 +106,10 @@ const getAllProducts = async (reqQuery) => {
     }
 
     if (minPrice && maxPrice) {
-        query =  query.where("discountedPrice").gte(minPrice).lte(maxPrice);
+        query = query.where("discountedPrice").gte(minPrice).lte(maxPrice);
     }
-    if(minDiscount){
-        query =  query.where("discountedPersent").gt(minDiscount);
+    if (minDiscount) {
+        query = query.where("discountedPersent").gt(minDiscount);
     }
 
     if (stock) {
@@ -119,33 +119,30 @@ const getAllProducts = async (reqQuery) => {
             query = query.where("stockQuantity").lte(0);
         }
     }
-    
+
     if (sort) {
         const sortDirection = sort == "price_hight" ? -1 : 1;
         query = query.sort({ discountedPrice: sortDirection });
     }
-    
-    const totalProducts=  await products.countDocuments(query)
-    const skip=(pageNumber-1)*pageSize
+
+    const totalProducts = await products.countDocuments(query)
+    const skip = (pageNumber - 1) * pageSize
     query = query.skip(skip).limit(pageSize)
 
-    const Products= await query.exec();
+    const Products = await query.exec();
 
-    const totalPages=Math.ceil(totalProducts/pageSize)
+    const totalPages = Math.ceil(totalProducts / pageSize)
 
-    return {content:Products,currentPage:pageNumber, totalPages}
+    return { content: Products, currentPage: pageNumber, totalPages }
+}
 
-
-    const createMultipleProducts=async()=>
-    {
-        for(let Product of Products)
-        {
-            await createProduct(product) 
-        }
+const createMultipleProducts = async (Products) => {
+    for (let Product of Products) {
+        await createProduct(Product)
     }
 }
 
-module.exports={
+module.exports = {
     createProduct,
     deleteProduct,
     updateProduct,

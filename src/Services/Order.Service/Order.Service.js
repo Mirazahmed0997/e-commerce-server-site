@@ -3,6 +3,7 @@ const Address = require("../../Models/V0/address.model/address.model.js")
 const order = require('../../Models/V0/Order.model/order.model')
 const path = require('path')
 const { populate } = require('../../Models/V0/Cart.model/Cart.model')
+const orderItems = require('../../Models/V0/Order.model/orderItems.js')
 
 const createOrder = async (user, shippingAddress) => {
     let address
@@ -19,8 +20,8 @@ const createOrder = async (user, shippingAddress) => {
         await user.save();
     }
 
-    const cart = await cartService.fundUserCart(user._id)
-    const orderItems = []
+    const cart = await cartService.findUserCart(user._id)
+    const OrderItems = []
 
     for (const item of cart.cartItems) {
         const orderItem = new orderItems({
@@ -33,7 +34,7 @@ const createOrder = async (user, shippingAddress) => {
         })
 
         const createdOrderItem = await orderItem.save();
-        orderItems.push(createdOrderItem)
+        OrderItems.push(createdOrderItem)
     }
 
     const createdOrder = new Order({
@@ -46,7 +47,7 @@ const createOrder = async (user, shippingAddress) => {
         shippingAddress: address,
     })
 
-    const savedOrder = await createOrder.save();
+    const savedOrder = await createdOrder.save();
     return savedOrder
 }
 
@@ -105,7 +106,7 @@ const orderHistory = async (userId) => {
         throw new Error(error.message)
     }
 }
-const allOrder = async () => {
+const getAllOrder = async () => {
     const allOrders = await order.find()
         .populate({ path: "orderItems", populate: { path: "products" } }).lean()
 
@@ -128,7 +129,7 @@ module.exports={
     cancelOrder,
     findOrderById,
     orderHistory,
-    allOrder,
+    getAllOrder,
     deleteOrder
 
 }
