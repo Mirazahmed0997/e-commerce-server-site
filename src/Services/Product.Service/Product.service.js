@@ -1,40 +1,43 @@
- const category = require("../../Models/V0/Category.model/category.model");
+const Category = require("../../Models/V0/Category.model/category.model");
 const products = require("../../Models/V0/product.model/product.model");
 
 async function createProduct(reqData) {
     let topLevel = await category.findOne({ name: reqData.topLevelCategory });
 
     if (!topLevel) {
-        topLevel = new category({
+        topLevel = new Category({
             name: reqData.topLevelCategory,
             level: 1,
         });
+        await topLevel.save()
     }
 
-    let secondLevel = await category.findOne({
+    let secondLevel = await Category.findOne({
         name: reqData.secondLevelCategory,
         parentCategory: topLevel._id,
     });
 
     if (!secondLevel) {
-        secondLevel = new category({
+        secondLevel = new Category({
             name: reqData.secondLevelCategory,
             parentCategory: topLevel._id,
             level: 2
         })
+        await secondLevel.save()
     }
 
-    let thirdLevel = await category.findOne({
+    let thirdLevel = await Category.findOne({
         name: reqData.thirdLevelCategory,
         parentCategory: secondLevel._id,
     });
 
     if (!thirdLevel) {
-        thirdLevel = new category({
+        thirdLevel = new Category({
             name: reqData.thirdLevelCategory,
             parentCategory: secondLevel._id,
             level: 3
         })
+        await thirdLevel.save()
     }
 
     const Product = new products({
@@ -56,7 +59,7 @@ async function createProduct(reqData) {
 const deleteProduct = async (productId) => {
     const Product = await findProductById(productId)
 
-    await products.findByIdAndDelete(productId)
+    await products.findByIdAndDelete(Product)
     return "Product Deleted Successfully"
 
 }
@@ -83,7 +86,7 @@ const getAllProducts = async (reqQuery) => {
     let query = products.find().populate("category");
 
     if (category) {
-        const existCategory = await category.findOne({ name: category });
+        const existCategory = await Category.findOne({ name: category });
         if (existCategory) {
             query = query.where("category").equals(existCategory._id);
         } else {
@@ -132,8 +135,11 @@ const getAllProducts = async (reqQuery) => {
     const Products = await query.exec();
 
     const totalPages = Math.ceil(totalProducts / pageSize)
+    console.log(products)
 
     return { content: Products, currentPage: pageNumber, totalPages }
+
+    // return {  currentPage: pageNumber, totalPages }
 }
 
 const createMultipleProducts = async (Products) => {

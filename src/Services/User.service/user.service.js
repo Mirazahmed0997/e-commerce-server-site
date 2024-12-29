@@ -1,4 +1,3 @@
-const { error } = require("console");
 const mongoose= require("mongoose")
 const user = require("../../Models/V0/User/user.model.js");
 const bcrypt = require("bcrypt")

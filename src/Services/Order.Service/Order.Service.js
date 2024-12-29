@@ -3,13 +3,15 @@ const Address = require("../../Models/V0/address.model/address.model.js")
 const order = require('../../Models/V0/Order.model/order.model')
 const path = require('path')
 const { populate } = require('../../Models/V0/Cart.model/Cart.model')
-const orderItems = require('../../Models/V0/Order.model/orderItems.js')
+const OrderItem = require('../../Models/V0/Order.model/orderItems.js')
 
 const createOrder = async (user, shippingAddress) => {
     let address
+    // console.log(user,shippingAddress)
     if (shippingAddress._id) {
-        let existAddress = await Address.findById(shippingAddress._id)
+        let  existAddress = await Address.findById(shippingAddress._id)
         address = existAddress
+        console.log(existAddress)
     }
     else {
         address = new Address(shippingAddress)
@@ -21,11 +23,13 @@ const createOrder = async (user, shippingAddress) => {
     }
 
     const cart = await cartService.findUserCart(user._id)
-    const OrderItems = []
+    // console.log(user.firstName,"Cart.......",cart)
+    let orderItems = []
 
     for (const item of cart.cartItems) {
-        const orderItem = new orderItems({
-            price: item.price,
+        // console.log(user.firstName,"Items.....",item)
+        const orderItem = new OrderItem({
+            price: item.Price,
             product: item.product,
             quantity: item.quantity,
             size: item.size,
@@ -33,11 +37,15 @@ const createOrder = async (user, shippingAddress) => {
             discountedPrice: item.discountedPrice
         })
 
+        // console.log("Orderrrr....",OrderItem)
+
         const createdOrderItem = await orderItem.save();
-        OrderItems.push(createdOrderItem)
+        // console.log("CreatedOrders.......",createdOrderItem)
+        orderItems.push(createdOrderItem)
+        // console.log("itemsss",OrderItems)
     }
 
-    const createdOrder = new Order({
+    const createdOrder = new order({
         user,
         orderItems,
         totalPrice: cart.totalPrice,
@@ -46,6 +54,8 @@ const createOrder = async (user, shippingAddress) => {
         totalItem: cart.totalItem,
         shippingAddress: address,
     })
+
+    // console.log("ordersItemsss....",createdOrder)
 
     const savedOrder = await createdOrder.save();
     return savedOrder
@@ -89,8 +99,10 @@ const cancelOrder = async (orderId) => {
 const findOrderById = async (orderId) => {
     const Order = await order.findById(orderId)
         .populate("user")
-        .populate({ path: "orderItem", populate: { path: "products" } })
+        .populate({ path: "orderItems", populate: { path: "product" } })
         .populate("shippingAddress")
+
+       
 
     return Order;
 }
@@ -98,7 +110,7 @@ const findOrderById = async (orderId) => {
 const orderHistory = async (userId) => {
     try {
         const orders = await order.find({ user: userId, orderStatus: "PLACED" })
-            .populate({ path: "orderItems", populate: { path: "products" } }).lean()
+            .populate({ path: "orderItems", populate: { path: "product" } }).lean()
 
         return orders;
 
@@ -108,7 +120,7 @@ const orderHistory = async (userId) => {
 }
 const getAllOrder = async () => {
     const allOrders = await order.find()
-        .populate({ path: "orderItems", populate: { path: "products" } }).lean()
+        .populate({ path: "orderItems", populate: { path: "product" } }).lean()
 
     return allOrders;
 }

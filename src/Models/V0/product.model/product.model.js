@@ -21,10 +21,10 @@ const productSchema = new mongoose.Schema({
     }],
 
     imageUrl:{type:String},
-    ratings:{type: mongoose.Schema.Types.ObjectId, ref: "ratings", required: false},
-    reviews:{type: mongoose.Schema.Types.ObjectId, ref: "reviews", required: false},
+    ratings:[{type: mongoose.Schema.Types.ObjectId, ref: "ratings", required: false}],
+    reviews:[{type: mongoose.Schema.Types.ObjectId, ref: "reviews", required: false}],
     numbOfRatings: { type: Number, default: 0 },
-    category:{type: mongoose.Schema.Types.ObjectId, ref: "categories", required: false},
+    category:[{type: mongoose.Schema.Types.ObjectId, ref: "categories", required: false}],
     createdAt:{type:Date,default:Date.now()},
 })
 
