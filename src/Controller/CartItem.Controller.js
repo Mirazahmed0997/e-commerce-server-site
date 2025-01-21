@@ -3,6 +3,8 @@ const cartItemService= require("../Services/Cart.service/CartItem.Service.js")
 const updateCartItem=async(req,res)=>
 {
     const user= await req.user;
+
+    console.log(req.params.id)
     try {
         const updatedCartItem= await cartItemService.updateCartItem(user._id,req.params.id,req.body);
         return res.status(200).send(updatedCartItem);

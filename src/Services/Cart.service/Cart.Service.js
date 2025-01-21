@@ -27,7 +27,7 @@ const findUserCart = async (userId) => {
         // console.log("cart items", CartItems)
 
         Cart.cartItems = CartItems;
-            // console.log(Cart)
+            console.log("cart",CartItems)
         let totalPrice = 0;
         let totalDiscountedPrice = 0;
         let totsalItem = 0;
@@ -69,7 +69,8 @@ const addCartItem = async (userId, req) => {
             const CartItem = new cartItems({
                 product: product._id, 
                 cart: Cart._id,
-                quantity: 1,
+                quantity: req.quantity || 1,
+                color: req.color,
                 userId,
                 size: req.size,
                 discountedPrice: product.discountedPrice

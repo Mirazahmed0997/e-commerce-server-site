@@ -2,15 +2,26 @@ const Category = require("../../Models/V0/Category.model/category.model");
 const products = require("../../Models/V0/product.model/product.model");
 
 async function createProduct(reqData) {
-    let topLevel = await category.findOne({ name: reqData.topLevelCategory });
+    let topLevel = await Category.findOne({ name: reqData.topLevelCategory });
+
+    console.log("req data", reqData.sellPrice)
+    let calDiscountedPrice = reqData.sellPrice; // Default to sellPrice
+    if (reqData.discountedPercent) {
+        calDiscountedPrice = reqData.sellPrice - (reqData.sellPrice * reqData.discountedPercent / 100);
+    }
+
 
     if (!topLevel) {
         topLevel = new Category({
             name: reqData.topLevelCategory,
             level: 1,
         });
+        console.log("create", topLevel)
+
         await topLevel.save()
     }
+
+    console.log("exist", topLevel)
 
     let secondLevel = await Category.findOne({
         name: reqData.secondLevelCategory,
@@ -23,8 +34,11 @@ async function createProduct(reqData) {
             parentCategory: topLevel._id,
             level: 2
         })
+        console.log("create", secondLevel)
         await secondLevel.save()
     }
+    console.log("exist", secondLevel)
+
 
     let thirdLevel = await Category.findOne({
         name: reqData.thirdLevelCategory,
@@ -37,21 +51,31 @@ async function createProduct(reqData) {
             parentCategory: secondLevel._id,
             level: 3
         })
+        console.log("create", thirdLevel)
         await thirdLevel.save()
     }
+    console.log("exist", secondLevel)
+
+    console.log(calDiscountedPrice)
 
     const Product = new products({
         title: reqData.title,
-        color: reqData.color,
+        color: reqData.color.split(",").map(c => c.trim().toLowerCase()),
         description: reqData.description,
         imageUrl: reqData.imageUrl,
+        thumNailImage:reqData.thumNailImage,
         brand: reqData.brand,
         buyPrice: reqData.buyPrice,
         sellPrice: reqData.sellPrice,
         sizes: reqData.sizes,
         stockQuantity: reqData.stockQuantity,
         category: thirdLevel._id,
+        categoryName: thirdLevel.name,
+        discountedPrice: calDiscountedPrice,
+        discountedPercent: reqData.discountedPercent
     })
+
+    console.log("create product", Product)
 
     return await Product.save()
 }
@@ -83,12 +107,15 @@ const getAllProducts = async (reqQuery) => {
 
     pageSize = pageSize || 10;
 
-    let query = products.find().populate("category");
+    let query = products.find().populate("category")
+    // console.log(Products)
 
     if (category) {
         const existCategory = await Category.findOne({ name: category });
+        console.log("exist ", existCategory._id)
         if (existCategory) {
             query = query.where("category").equals(existCategory._id);
+            // console.log("cat query",query)
         } else {
             return { content: [], currentPage: 1, totalPages: 0 };
         }
@@ -96,12 +123,12 @@ const getAllProducts = async (reqQuery) => {
 
 
     if (color) {
-        const colorSet = new Set(color.split(",").map(color => color.trim().toLowerCase()));
-
-        const colorRegex = colorSet.size > 0 ? new RegExp([...colorSet].join("|"), "i") : null;
-
-        query = query.where("color").regex(colorRegex);
+        const colorSet = new Set(color.split(",").map(c => c.trim().toLowerCase()));
+        if (colorSet.size > 0) {
+            query = query.where("color").in([...colorSet]);
+        }
     }
+
 
     if (sizes) {
         const sizesSet = new Set(sizes);
@@ -135,7 +162,7 @@ const getAllProducts = async (reqQuery) => {
     const Products = await query.exec();
 
     const totalPages = Math.ceil(totalProducts / pageSize)
-    console.log(products)
+    console.log("products", Products)
 
     return { content: Products, currentPage: pageNumber, totalPages }
 

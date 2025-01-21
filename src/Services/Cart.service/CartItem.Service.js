@@ -2,6 +2,7 @@ const cartItems = require('../../Models/V0/Cart.model/CartItems.model.js');
 const userService = require('../User.service/user.service.js')
 
 const updateCartItem = async (userId, cartItemId, cartItemData) => {
+    console.log(cartItemData.data.quantity)
     try {
         const item = await findCartItemById(cartItemId)
         console.log("itemssssss",item)
@@ -18,10 +19,10 @@ const updateCartItem = async (userId, cartItemId, cartItemData) => {
         // console.log(item.product)
 
         if (user._id.toString() === userId.toString()) {
-            item.quantity = cartItemData.quantity
+            item.quantity = cartItemData.data.quantity
             // item.size = cartItemData.size
-            item.price = item.quantity * item.product.sellPrice
-            item.discountedPrice = item.quantity * item.product.discountedPrice
+            item.price = item.quantity * item.product.discountedPrice
+            // item.discountedPrice = item.quantity * item.product.discountedPrice
             const updatedCartItem = await item.save();
             return updatedCartItem;
         }

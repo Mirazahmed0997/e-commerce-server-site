@@ -27,6 +27,7 @@ const orderHistory=async(req,res)=>
     const user=await req.user
     try {
         const createdOrder=await  orderService.orderHistory(user._id)
+        // console.log(createdOrder)
         return res.status(201).send(createdOrder)
     } 
     catch (error) {
