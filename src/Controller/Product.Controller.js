@@ -1,6 +1,7 @@
 const productService = require('../Services/Product.Service/Product.service')
 
-const createProduct = async (req, res) => {
+const createProduct = async (req,res) => {
+    console.log(req)
     try {
         const product = await productService.createProduct(req.body);
         return res.status(201).send(product);
